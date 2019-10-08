@@ -5,6 +5,8 @@ import numpy as np
 import co_rm_amInformation as co
 
 
+# testing git push
+
 x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
 x2 = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
 y = np.array([6, 7, 8, 9, 10, 6, 7, 8, 9])
