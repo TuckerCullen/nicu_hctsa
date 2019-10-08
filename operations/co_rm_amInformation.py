@@ -1,5 +1,4 @@
-import numpy as np
-import rm_information as info
+from toolboxes import rm_information as info
 
 
 def co_rm_amInformation(*args):

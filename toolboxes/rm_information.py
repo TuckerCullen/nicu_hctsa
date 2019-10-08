@@ -1,5 +1,5 @@
 import numpy as np
-import rm_histogram2 as rmh
+from toolboxes import rm_histogram2 as rmh
 import math
 
 

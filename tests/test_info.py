@@ -1,11 +1,6 @@
-
-import rm_histogram2 as hist
-import rm_information as info
+from toolboxes import rm_histogram2 as hist, rm_information as info
 import numpy as np
-import co_rm_amInformation as co
-
-
-# testing git push
+from operations import co_rm_amInformation as co
 
 x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
 x2 = np.array([[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]])
