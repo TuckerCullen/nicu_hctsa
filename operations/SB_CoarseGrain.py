@@ -37,7 +37,7 @@ def SB_CoarseGrain(y, howtocg, numGroups):
         N = N - 1 # the time series is one value shorter than the input because of differenceing
         howtocg = 'quantile'
 
-    if howtocg == 'embed2quadrants' or 'embed2octants':
+    elif howtocg == 'embed2quadrants' or 'embed2octants':
         # construct the embedding
 
         if (numGroups == 'tau'):
@@ -64,8 +64,8 @@ def SB_CoarseGrain(y, howtocg, numGroups):
 
     if howtocg == 'quantile':
 
-        th = sc.stats.mstats.mquantiles(y, np.linspace(0, 1, numGroups + 1), alphap=0.5, betap=0.5) #matlab uses peicewise linear interpolation for calculating quantiles, hence alphap=0.5, betap=0.5
-        th[0] = th[0] - 1 #ensures the first point is included
+        th = sc.stats.mstats.mquantiles(y, np.linspace(0, 1, numGroups + 1), alphap=0.5, betap=0.5) # matlab uses peicewise linear interpolation for calculating quantiles, hence alphap=0.5, betap=0.5
+        th[0] = th[0] - 1 # ensures the first point is included
         yth = np.zeros([N, 1])
         for i in range(0, numGroups):  # had some trouble here finding indexes that satisfy two conditions in python, hence this is written differently then in matlab
 
