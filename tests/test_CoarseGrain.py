@@ -1,6 +1,6 @@
 
 from operations import SB_CoarseGrain as cg
-from operations import BF_ResetSeed as rs
+from periphery_functions import BF_ResetSeed as rs
 import numpy as np
 import random
 
