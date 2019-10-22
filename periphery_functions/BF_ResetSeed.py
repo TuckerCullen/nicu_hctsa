@@ -1,5 +1,6 @@
 
 import random
+import numpy as np
 
 def BF_ResetSeed(resetHow= 'default'):
     '''
@@ -9,6 +10,7 @@ def BF_ResetSeed(resetHow= 'default'):
     :param resetHow = method for resetting the seed
     :return: void
     '''
+
 
     if resetHow == 'default':
 

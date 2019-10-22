@@ -67,13 +67,13 @@ def SB_CoarseGrain(y, howtocg, numGroups):
         th = sc.stats.mstats.mquantiles(y, np.linspace(0, 1, numGroups + 1), alphap=0.5, betap=0.5) # matlab uses peicewise linear interpolation for calculating quantiles, hence alphap=0.5, betap=0.5
         th[0] = th[0] - 1 # ensures the first point is included
         yth = np.zeros([N, 1])
+
         for i in range(0, numGroups):  # had some trouble here finding indexes that satisfy two conditions in python, hence this is written differently then in matlab
 
             z = ((y > th[i]) & (y <= th[i+1])).nonzero()[0]
 
-            if len(z) >= 1:
-                yth[z[0]] = i+1
-
+            for x in range(0, len(z)):
+                yth[z[x]] = i + 1
 
     elif howtocg == 'embed2quadrants':
         #turn the time series data into a set of numbers from 1:numGroups
@@ -107,7 +107,9 @@ def SB_CoarseGrain(y, howtocg, numGroups):
         yth[o7r] = 7
         yth[o8r] = 8
 
+
     if np.any(yth == 0):
+        print(yth)
         print("Error: all values in the sequence were not assigned to a group")
 
     return yth # return the output
