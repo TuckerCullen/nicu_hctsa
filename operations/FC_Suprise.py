@@ -9,6 +9,7 @@ from scipy import io
 import random
 
 # WORK IN PROGRESS!!!!!!!!
+#Feel pretty confident about 'dist' case, not so much T1 and T2 yet
 
 def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod='quantile', numIters=500, randomSeed='default'):
     '''
@@ -119,7 +120,7 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
             return
 
     # INFORMATION GAINED FROM NEXT OBSERVATION IS log(1/p) = -log(p)
-    
+
     store[store == 0] = 1 # so that we set log[0] == 0
 
 
