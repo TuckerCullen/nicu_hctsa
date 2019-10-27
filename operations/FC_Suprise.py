@@ -5,11 +5,13 @@ from periphery_functions import BF_ResetSeed as reset
 import scipy as sc
 from scipy import stats
 import math
-from scipy import io
+import scipy.io
 import random
 
-# WORK IN PROGRESS!!!!!!!!
-#Feel pretty confident about 'dist' case, not so much T1 and T2 yet
+# -----------------------------------------------------------------------------------------------------------------------------------------------------
+# TESTING VERSION
+# Everything is working, testing print statements and intermediate variables are left commented, uncomment to debug issues
+#------------------------------------------------------------------------------------------------------------------------------------------------------
 
 def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod='quantile', numIters=500, randomSeed='default'):
     '''
@@ -53,7 +55,7 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
     # COURSE GRAIN ----------------------------------------------------------------------------------------------------------------
 
     yth = cg.SB_CoarseGrain(y, coarseGrainMethod, numGroups) # a coarse-grained time series using the numbers 1:numgroups
-    #print(yth)
+    # print("yth: ", yth[20607])
 
     N = int(len(yth))
 
@@ -64,18 +66,20 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
 
     # FOR TESTING PURPOSES!!!
     # rs = np.array([3, 4, 5, 6, 7, 8])
-    # data = io.loadmat("rs.mat", squeeze_me = True)
-    # rs = np.asarray(data['rs'])
+
+    data = scipy.io.loadmat('rs_var.mat', squeeze_me = False)
+    rs = np.asarray(data['rs'])
+    # print("rs: ", rs.size)
 
     # compute empirical probabilities
     store = np.zeros([numIters, 1])
 
-    for i in range(0, len(rs)):
+    for i in range(0, rs.size): # rs.size
         if whatPrior == 'dist':
             # uses the distribution up to memory to inform the next point
 
-            p = np.sum(yth[np.arange(rs[i]-memory-1, rs[i]-1)] == yth[rs[i]-1])/memory # had to be careful with indexing, arange() works like matlab's : operator
-            #print("p: ", p)
+            p = np.sum(yth[np.arange(rs[0, i]-memory-1, rs[0, i]-1)] == yth[rs[0, i]-1])/memory # had to be careful with indexing, arange() works like matlab's : operator
+            # print("p: ", p)
             store[i] = p
 
 
@@ -83,19 +87,42 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
             # uses one-point correlations in memory to inform the next point
 
             # estimate transition probabilites from data in memory
-            # find where in memory this has been obserbed before, and preceeded it
+            # find where in memory this has been observbed before, and preceded it
 
-            memoryData = yth[np.arange(rs[i] - memory-1, rs[i]-1)]
-            # print('memoryData: ', memoryData)
+            # first = rs[0, i] - memory
+            # second = rs[0, i] - 1
+            # print("first: ", first)
+            # print("second: ", second)
+            # print("---------------------------------------------------------")
+            memoryData = yth[rs[0, i] - memory - 1:rs[0, i]-1] # every outputted value should be one less than in matlab
+            # print('memoryData: ', memoryData.size)
+
+            # a = memoryData[0:memoryData.size-1]
+            # print("length A: ", len(a))
+            # b = yth[rs[0, i] - 1]
+            # print(rs[0, i])
+            # print("B: ", b)
+
+
+            testing = memoryData[0:memoryData.size - 1] == yth[rs[0, i]-2] # this works
+            # print("testing: ", testing)
+            # print("4", testing[4])
+
+
 
             #previous data observed in memory here
-            inmem = np.argwhere(memoryData[0:len(memoryData)-1] == yth[rs[i]-1])
+            inmem = np.nonzero(memoryData[0:memoryData.size - 1] == yth[rs[0, i]-2])
+            inmem = inmem[0]
             # print('inmem: ', inmem)
 
-            if inmem.size == 0:
+
+            if len(inmem) == 0:
                 p = 0
             else:
-                p = np.mean(memoryData[inmem -1]  == yth[rs[i]-3]) #not sure about indexing here,
+                # ab = memoryData[inmem + 1] == yth[rs[0, i]-1]
+                # print("ab", ab)
+                p = np.mean(memoryData[inmem + 1] == yth[rs[0, i]-1]) #not sure about indexing here,
+                # print("P ", p)
 
             store[i] = p
 
@@ -103,15 +130,19 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
 
             # uses two point correlations in memory to inform the next point
 
-            memoryData = yth[np.arange(rs[i] - memory-1, rs[i]-1)]
+            memoryData = yth[rs[0, i] - memory - 1:rs[0, i]-1] # every outputted value should be one less than in matlab
 
-            inmem1 = np.argwhere(memoryData[2:len(memoryData)] == yth[rs[i]-1]) #I don't think indexes are right, but isnt affecting output much on large input
-            inmem2 = np.argwhere(memoryData[inmem1] == yth[rs[i]-2])
+            inmem1 = np.nonzero(memoryData[1:memoryData.size - 1] == yth[rs[0, i]-2])
+            inmem1 = inmem1[0]
+            print("inmem1: ", inmem1)
+            inmem2 = np.nonzero(memoryData[inmem1] == yth[rs[0, i]-3])
+            inmem2 = inmem2[0]
+
 
             if inmem2.size == 0:
                 p = 0
             else:
-                p = np.sum(memoryData[inmem2+2] == yth[rs[i]])/len(inmem2)
+                p = np.sum(memoryData[inmem2+2] == yth[rs[0, i]-1])/len(inmem2)
 
             store[i] = p
 
@@ -121,6 +152,7 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
 
     # INFORMATION GAINED FROM NEXT OBSERVATION IS log(1/p) = -log(p)
 
+    # print("Store: ", store)
     store[store == 0] = 1 # so that we set log[0] == 0
 
 
@@ -141,8 +173,10 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
     out['mean'] = np.mean(store)
     out['sum'] = np.sum(store)
     out['median'] = np.median(store)
-    out['lq'] = sc.stats.mstats.mquantiles(store, 0.25, alphap=0.5, betap=0.5)
-    out['uq'] = sc.stats.mstats.mquantiles(store, 0.75, alphap=0.5, betap=0.5)
+    lq = sc.stats.mstats.mquantiles(store, 0.25, alphap=0.5, betap=0.5) # outputs an array of size one
+    out['lq'] = lq[0] #convert array to int
+    uq = sc.stats.mstats.mquantiles(store, 0.75, alphap=0.5, betap=0.5)
+    out['uq'] = uq[0]
     out['std'] = np.std(store)
 
     if out['std'] == 0:

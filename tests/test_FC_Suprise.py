@@ -1,6 +1,5 @@
 
 from operations import SB_CoarseGrain as cg
-from periphery_functions import BF_ResetSeed as rs
 import numpy as np
 import random
 from operations import FC_Suprise as sup
@@ -11,6 +10,9 @@ y1 = np.array([8, 3, 18, 9, 6, 2, 19, 20])
 
 data = io.loadmat("UVA0001_rr", squeeze_me = True)
 rr = np.asarray(data['rr'])
+
+rs = io.loadmat('rs_var.mat', squeeze_me = False)
+# print(rs)
 
 # print('updown test')
 # yth1 = cg.SB_CoarseGrain(y1, "updown", 10)
@@ -31,20 +33,22 @@ rr = np.asarray(data['rr'])
 # rs.BF_ResetSeed('none')
 # print("random number: ", random.randint(1, 10))
 
-# print("Test FC Suprise Default")
-# out1 = sup.FC_Suprise(y1)
-# print("out1: ", out1)
-# print()
+print("Test FC Suprise Default")
+out1 = sup.FC_Suprise(rr)
+print("out1: ", out1)
+print()
 
 # print("T1 Test")
 # out3 = sup.FC_Suprise(rr, whatPrior='T1')
 # print("out3: ", out3)
 # print()
 
-print("T2 Test")
-out4 = sup.FC_Suprise(rr, whatPrior='T2')
-print("out4: ", out4)
-print()
+# print("T2 Test")
+# out4 = sup.FC_Suprise(rr, whatPrior='T2')
+# print("out4: ", out4)
+# print()
+
+
 
 
 
