@@ -2,11 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ec50b807-232e-4430-b493-7f0a4ba4c9f2" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/operations/rs_var.mat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/tests/rs_var.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/operations/FC_Suprise.py" beforeDir="false" afterPath="$PROJECT_DIR$/operations/FC_Suprise.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/operations/SB_CoarseGrain.py" beforeDir="false" afterPath="$PROJECT_DIR$/operations/SB_CoarseGrain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/periphery_functions/BF_ResetSeed.py" beforeDir="false" afterPath="$PROJECT_DIR$/periphery_functions/BF_ResetSeed.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_FC_Suprise.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_FC_Suprise.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />

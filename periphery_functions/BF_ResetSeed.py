@@ -1,6 +1,5 @@
 
 import random
-import numpy as np
 
 def BF_ResetSeed(resetHow= 'default'):
     '''

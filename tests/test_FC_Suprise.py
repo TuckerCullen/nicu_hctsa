@@ -38,15 +38,15 @@ out1 = sup.FC_Suprise(rr)
 print("out1: ", out1)
 print()
 
-# print("T1 Test")
-# out3 = sup.FC_Suprise(rr, whatPrior='T1')
-# print("out3: ", out3)
-# print()
+print("T1 Test")
+out3 = sup.FC_Suprise(rr, whatPrior='T1')
+print("out3: ", out3)
+print()
 
-# print("T2 Test")
-# out4 = sup.FC_Suprise(rr, whatPrior='T2')
-# print("out4: ", out4)
-# print()
+print("T2 Test")
+out4 = sup.FC_Suprise(rr, whatPrior='T2')
+print("out4: ", out4)
+print()
 
 
 

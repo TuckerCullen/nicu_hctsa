@@ -1,17 +1,14 @@
 
 import numpy as np
-from operations import SB_CoarseGrain as cg
-from periphery_functions import BF_ResetSeed as reset
 import scipy as sc
 from scipy import stats
 import math
-import scipy.io
-import random
+import scipy.io # only needed if you uncomment testing code to compare with matlab (circumvents differences in random permutation between python and MATLAB)
 
-# -----------------------------------------------------------------------------------------------------------------------------------------------------
-# TESTING VERSION
-# Everything is working, testing print statements and intermediate variables are left commented, uncomment to debug issues
-#------------------------------------------------------------------------------------------------------------------------------------------------------
+# HELPER FILES REQUIRED
+from operations import SB_CoarseGrain as cg
+from periphery_functions import BF_ResetSeed as reset
+
 
 def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod='quantile', numIters=500, randomSeed='default'):
     '''
@@ -47,15 +44,19 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
     :return: a dictionary containing summaries of this series of information gains, including: minimum, maximum, mean, median, lower and upper quartiles, and standard deviation
     '''
 
-    # Check inputs and set defaults -- most defaults were set in the function declaration above ---------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------------------------------------------------
+    # Check inputs and set defaults -- most defaults were set in the function declaration above
+    #------------------------------------------------------------------------------------------------------------------------------------------------------
 
     if (memory > 0) and (memory < 1): #specify memory as a proportion of the time series length
         memory = int(np.round(memory*len(y)))
 
-    # COURSE GRAIN ----------------------------------------------------------------------------------------------------------------
+    # ----------------------------------------------------------------------------------------------------------------------------------------------------
+    # COURSE GRAIN
+    # requires SB_CoarseGrain.py helper function
+    #------------------------------------------------------------------------------------------------------------------------------------------------------
 
     yth = cg.SB_CoarseGrain(y, coarseGrainMethod, numGroups) # a coarse-grained time series using the numbers 1:numgroups
-    # print("yth: ", yth[20607])
 
     N = int(len(yth))
 
@@ -63,15 +64,18 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
     reset.BF_ResetSeed(randomSeed) #in matlab randomSeed defaults to an empty array [] and is then converted to 'default', here it defaults to 'default'
     rs = np.random.permutation(int(N-memory)) + memory # can't do beginning of time series, up to memory
     rs = np.sort(rs[0:min(numIters,(len(rs)-1))])
+    rs = np.array([rs]) # made into two dimensional array to match matlab and work with testing code directly below
 
-    # FOR TESTING PURPOSES!!!
-    # rs = np.array([3, 4, 5, 6, 7, 8])
 
-    data = scipy.io.loadmat('rs_var.mat', squeeze_me = False)
-    rs = np.asarray(data['rs'])
-    # print("rs: ", rs.size)
+    # UNCOMMENT CODE BELOW TO COMPARE TO MATLAB USING rr data, make sure 'rs_var.mat' is in same folder as test file ( it's the resulting matlab rs value when using the UVA0001_rr.mat)
+    # data = scipy.io.loadmat('rs_var.mat', squeeze_me = False)
+    # rs = np.asarray(data['rs'])
+    # print("rs MATLAB: ", rs)
 
-    # compute empirical probabilities
+    # -------------------------------------------------------------------------------------------------------------------
+    # COMPUTE EMPIRICAL PROBABILITIES FROM TIME SERIES
+    #-------------------------------------------------------------------------------------------------------------------
+
     store = np.zeros([numIters, 1])
 
     for i in range(0, rs.size): # rs.size
@@ -79,7 +83,6 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
             # uses the distribution up to memory to inform the next point
 
             p = np.sum(yth[np.arange(rs[0, i]-memory-1, rs[0, i]-1)] == yth[rs[0, i]-1])/memory # had to be careful with indexing, arange() works like matlab's : operator
-            # print("p: ", p)
             store[i] = p
 
 
@@ -89,40 +92,17 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
             # estimate transition probabilites from data in memory
             # find where in memory this has been observbed before, and preceded it
 
-            # first = rs[0, i] - memory
-            # second = rs[0, i] - 1
-            # print("first: ", first)
-            # print("second: ", second)
-            # print("---------------------------------------------------------")
             memoryData = yth[rs[0, i] - memory - 1:rs[0, i]-1] # every outputted value should be one less than in matlab
-            # print('memoryData: ', memoryData.size)
 
-            # a = memoryData[0:memoryData.size-1]
-            # print("length A: ", len(a))
-            # b = yth[rs[0, i] - 1]
-            # print(rs[0, i])
-            # print("B: ", b)
-
-
-            testing = memoryData[0:memoryData.size - 1] == yth[rs[0, i]-2] # this works
-            # print("testing: ", testing)
-            # print("4", testing[4])
-
-
-
-            #previous data observed in memory here
+            # previous data observed in memory here
             inmem = np.nonzero(memoryData[0:memoryData.size - 1] == yth[rs[0, i]-2])
-            inmem = inmem[0]
-            # print('inmem: ', inmem)
+            inmem = inmem[0] # nonzero outputs a tuple of two arrays for some reason, the second one of all zeros
 
 
-            if len(inmem) == 0:
+            if inmem.size == 0:
                 p = 0
             else:
-                # ab = memoryData[inmem + 1] == yth[rs[0, i]-1]
-                # print("ab", ab)
-                p = np.mean(memoryData[inmem + 1] == yth[rs[0, i]-1]) #not sure about indexing here,
-                # print("P ", p)
+                p = np.mean(memoryData[inmem + 1] == yth[rs[0, i]-1])
 
             store[i] = p
 
@@ -134,7 +114,7 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
 
             inmem1 = np.nonzero(memoryData[1:memoryData.size - 1] == yth[rs[0, i]-2])
             inmem1 = inmem1[0]
-            print("inmem1: ", inmem1)
+
             inmem2 = np.nonzero(memoryData[inmem1] == yth[rs[0, i]-3])
             inmem2 = inmem2[0]
 
@@ -150,11 +130,11 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
             print("Error: unknown method: " + whatPrior)
             return
 
+    # ------------------------------------------------------------------------------------------------------------------------------------------
     # INFORMATION GAINED FROM NEXT OBSERVATION IS log(1/p) = -log(p)
+    #-------------------------------------------------------------------------------------------------------------------------------------------
 
-    # print("Store: ", store)
     store[store == 0] = 1 # so that we set log[0] == 0
-
 
     out = {} # dictionary for outputs
 
@@ -164,12 +144,13 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
 
     store = -(np.log(store))
 
+    #minimum amount of information you can gain in this way
     if np.any(store > 0):
         out['min'] = min(store[store > 0]) # find the minimum value in the array, excluding zero
     else:
         out['min'] = np.nan
 
-    out['max'] = np.max(store)
+    out['max'] = np.max(store) # maximum amount of information you cna gain in this way
     out['mean'] = np.mean(store)
     out['sum'] = np.sum(store)
     out['median'] = np.median(store)
@@ -184,7 +165,7 @@ def FC_Suprise( y, whatPrior='dist', memory=0.2, numGroups=3, coarseGrainMethod=
     else:
         out['tstat'] = abs((out['mean']-1)/(out['std']/math.sqrt(numIters)))
 
-    return out
+    return out # returns a dict with all of the output instead of a struct like in matlab, python doesnt have structs
 
 
 
